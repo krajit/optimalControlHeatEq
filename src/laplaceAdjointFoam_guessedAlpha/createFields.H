@@ -13,7 +13,7 @@ IOdictionary physicalProperties
 
 dimensionedScalar k(physicalProperties.lookup("k"));
 dimensionedScalar beta(physicalProperties.lookup("beta"));
-//dimensionedScalar alpha(physicalProperties.lookup("alpha"));
+dimensionedScalar alpha(physicalProperties.lookup("alpha"));
 dimensionedScalar lambda(physicalProperties.lookup("lambda"));
 
 
@@ -149,19 +149,6 @@ volScalarField udiff
 	IOobject::AUTO_WRITE
     ),
     u - uc
-);
-
-volScalarField uk
-(
-    IOobject
-    (
-	"uk",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::NO_WRITE
-    ),
-    u
 );
 
 

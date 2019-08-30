@@ -47,12 +47,6 @@ int main(int argc, char *argv[])
     // Cost function value
     scalar J = 0;
     scalar Jold = 0;
-    scalar Jk = 0;
-
-    scalar alpha = 1000;
-
-    scalar c1 = 1e-4;
-    scalar c2 = 0.8;
 
 // Compute cost function value
 #include "costFunctionValue.H"
@@ -62,49 +56,20 @@ int main(int argc, char *argv[])
 
     while (runTime.loop() && fabs(J - Jold) > tol)
     {
-        // save old cost value
-        Jold = J;
-
         // Primal equation
         solve(fvm::laplacian(k, y) + beta * u);
 
         // Adjoint equation
         solve(fvm::laplacian(k, p) + y - yd);
+        uc = -(beta/lambda)*p;
+        udiff = u - uc;
 
-        // Save current control
-        uk = u;
 
-        // calculate current cost
-        Jk = 0.5 * gSum(volField * (Foam::pow(y.internalField() - yd.internalField(), 2) + lambda * Foam::pow(u.internalField(), 2)));
+        // Update control
+        u = u - alpha * (lambda * u + beta * p);
 
-        bool alphaFound = false;
-
-        // calculate derivative^2 integrate((lambda*u + beta*p)^2 dv). Why??
-        scalar phip0 = gSum(volField * Foam::pow(lambda * uk.internalField() + beta * p.internalField(), 2));
-
-        while (!alphaFound)
-        {
-            u = uk - alpha * (lambda * uk + beta * p);
-            u.correctBoundaryConditions();
-
-            // get new y
-            solve(fvm::laplacian(k, y) + beta * u);
-
-            // get new cost
-            J = 0.5 * gSum(volField * (Foam::pow(y.internalField() - yd.internalField(), 2) + lambda * Foam::pow(u.internalField(), 2)));
-
-            if (J <= Jk - c1 * alpha * phip0)
-            {
-                Info << "alpha found, alpha = " << alpha << ", J = " << J << ", phip0" << phip0 << endl;
-
-                alphaFound = true;
-            }
-            else
-            {
-                Info << "alpha NOT found, alpha = " << alpha << endl;
-                alpha = c2 * alpha;
-            }
-        }
+        Jold = J;
+#include "costFunctionValue.H"
 
         Info << "Iteration no. " << runTime.timeName() << " - "
              << "Cost value " << J
@@ -112,9 +77,6 @@ int main(int argc, char *argv[])
              << "Cost variation" << fabs(J - Jold) << endl;
 
         file << runTime.value() << "," << J << nl;
-
-        uc = -(beta/lambda)*p;
-        udiff = u - uc;
 
         runTime.write();
     }
