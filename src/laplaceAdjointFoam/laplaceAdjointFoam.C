@@ -61,17 +61,20 @@ int main(int argc, char *argv[])
 
         // Adjoint equation
         solve(fvm::laplacian(k, p) + y - yd);
+        uc = -(beta/lambda)*p;
+        udiff = u - uc;
+
 
         // Update control
         u = u - alpha * (lambda * u + beta * p);
 
         Jold = J;
-        #include "costFunctionValue.H"
+#include "costFunctionValue.H"
 
         Info << "Iteration no. " << runTime.timeName() << " - "
              << "Cost value " << J
              << " - "
-             << "Cost variation" << fabs(J-Jold) << endl;
+             << "Cost variation" << fabs(J - Jold) << endl;
 
         file << runTime.value() << "," << J << nl;
 
@@ -84,6 +87,8 @@ int main(int argc, char *argv[])
     y.write();
     p.write();
     u.write();
+    uc.write();
+    udiff.write();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

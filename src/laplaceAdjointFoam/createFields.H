@@ -123,3 +123,32 @@ volScalarField u
 // );
 
 scalarField volField = mesh.V();
+
+
+volScalarField uc
+(
+    IOobject
+    (
+	"uc",
+	runTime.timeName(),
+	mesh,
+	IOobject::NO_READ,
+	IOobject::AUTO_WRITE
+    ),
+    -(beta/lambda)*p
+);
+
+volScalarField udiff
+(
+    IOobject
+    (
+	"udiff",
+	runTime.timeName(),
+	mesh,
+	IOobject::NO_READ,
+	IOobject::AUTO_WRITE
+    ),
+    u - uc
+);
+
+
