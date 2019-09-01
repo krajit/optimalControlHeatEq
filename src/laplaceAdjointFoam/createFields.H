@@ -13,7 +13,6 @@ IOdictionary physicalProperties
 
 dimensionedScalar k(physicalProperties.lookup("k"));
 dimensionedScalar beta(physicalProperties.lookup("beta"));
-//dimensionedScalar alpha(physicalProperties.lookup("alpha"));
 dimensionedScalar lambda(physicalProperties.lookup("lambda"));
 
 
@@ -33,7 +32,9 @@ IOdictionary numericalParameters
 );
 
 scalar tol(numericalParameters.lookupOrDefault<scalar>("tol", 1e-8));
-
+scalar alpha(numericalParameters.lookupOrDefault<scalar>("alpha", 1));
+scalar c1(numericalParameters.lookupOrDefault<scalar>("c1", 1e-4));
+scalar c2(numericalParameters.lookupOrDefault<scalar>("c2", 0.8));
 /****************************************************************************/
 
 Info << "Reading target field\n" << endl;
@@ -63,6 +64,36 @@ volScalarField f
     ),
     mesh
 );
+
+Info << "Reading uMax field\n" << endl;
+volScalarField uMax
+(
+    IOobject
+    (
+	"uMax",
+	runTime.constant(),
+	mesh,
+	IOobject::MUST_READ,
+	IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+
+Info << "Reading uMin field\n" << endl;
+volScalarField uMin
+(
+    IOobject
+    (
+	"uMin",
+	runTime.constant(),
+	mesh,
+	IOobject::MUST_READ,
+	IOobject::NO_WRITE
+    ),
+    mesh
+);
+
 
 /****************************************************************************/
 

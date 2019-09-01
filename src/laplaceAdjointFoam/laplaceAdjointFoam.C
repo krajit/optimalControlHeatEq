@@ -49,11 +49,6 @@ int main(int argc, char *argv[])
     scalar Jold = 0;
     scalar Jk = 0;
 
-    scalar alpha = 1000;
-
-    scalar c1 = 1e-4;
-    scalar c2 = 0.8;
-
 // Compute cost function value
 #include "costFunctionValue.H"
 
@@ -66,7 +61,7 @@ int main(int argc, char *argv[])
         Jold = J;
 
         // Primal equation
-        solve(fvm::laplacian(k, y) + beta * u);
+        solve(fvm::laplacian(k, y) + beta * u + f);
 
         // Adjoint equation
         solve(fvm::laplacian(k, p) + y - yd);
@@ -85,10 +80,17 @@ int main(int argc, char *argv[])
         while (!alphaFound)
         {
             u = uk - alpha * (lambda * uk + beta * p);
+
+            // truncate u for constrained control set
+            forAll(u,i){
+                u[i] = min(u[i], uMax[i]);
+                u[i] = max(u[i], uMin[i]);
+            }
+
             u.correctBoundaryConditions();
 
             // get new y
-            solve(fvm::laplacian(k, y) + beta * u);
+            solve(fvm::laplacian(k, y) + beta * u + f);
 
             // get new cost
             J = 0.5 * gSum(volField * (Foam::pow(y.internalField() - yd.internalField(), 2) + lambda * Foam::pow(u.internalField(), 2)));

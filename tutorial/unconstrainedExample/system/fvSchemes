@@ -11,11 +11,42 @@ FoamFile
     version         2.0;
     format          ascii;
     class           dictionary;
-    object          numericalParameters;
+    object          fvSchemes;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-tol 1e-8;
+ddtSchemes
+{
+    default steadyState;
+}
+
+gradSchemes
+{
+    default    	Gauss;
+}
+
+divSchemes
+{
+    default       none;  
+}
+
+
+laplacianSchemes
+{
+    default         		Gauss linear uncorrected;
+    laplacian(k,y) 		Gauss linear uncorrected;
+    laplacian(k,lambda)		Gauss linear uncorrected;
+}
+
+curlSchemes
+{
+    default         none;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
 
 // ************************************************************************* //
