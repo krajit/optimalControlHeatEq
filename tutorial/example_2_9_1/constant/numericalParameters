@@ -19,7 +19,7 @@ FoamFile
 tol 1e-8;
 
  // initial step length
- alpha 1;
+ alpha 50;
 
  / steplength backtracking parameters
  c1 1e-4;

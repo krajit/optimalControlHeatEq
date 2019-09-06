@@ -14,14 +14,14 @@ Line(4) = {4, 1};
 Line Loop(5) = {1, 2, 3, 4};
 Plane Surface(6) = {5};
 
-Transfinite Line{1, 3} = 8;
-Transfinite Line{2, 4} = 8;
+Transfinite Line{1, 3} = 161;
+Transfinite Line{2, 4} = 161;
 //Transfinite Line{1, 2, 3, 4} = 100;
 Transfinite Surface{6};
 Recombine Surface{6};
 
 newEntities[] =
-Extrude {0,0,0.1}
+Extrude {0,0,1}
 {
 	Surface{6};
 	Layers{1};

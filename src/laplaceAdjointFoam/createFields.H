@@ -139,48 +139,34 @@ volScalarField u
     mesh
 );
 
-// Info << "Calculating control variation p\n" << endl;
-// volScalarField p
-// (
-//     IOobject
-//     (
-// 	"p",
-// 	runTime.timeName(),
-// 	mesh,
-// 	IOobject::NO_READ,
-// 	IOobject::AUTO_WRITE
-//     ),
-//     lambda*p + beta*u
-// );
-
 scalarField volField = mesh.V();
 
-
-volScalarField uc
+volScalarField ud
 (
     IOobject
     (
-	"uc",
+	"ud",
+	runTime.timeName(),
+	mesh,
+	IOobject::MUST_READ,
+	IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+volScalarField uDiff
+(
+    IOobject
+    (
+	"uDiff",
 	runTime.timeName(),
 	mesh,
 	IOobject::NO_READ,
 	IOobject::AUTO_WRITE
     ),
-    -(beta/lambda)*p
+    u - ud
 );
 
-volScalarField udiff
-(
-    IOobject
-    (
-	"udiff",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-    ),
-    u - uc
-);
 
 volScalarField uk
 (

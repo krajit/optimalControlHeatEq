@@ -21,15 +21,15 @@ FoamFile
     {
         type            empty;
         physicalType    empty;
-        nFaces          98;
-        startFace       84;
+        nFaces          51200;
+        startFace       50880;
     }
     dirichletBoundary
     {
         type            patch;
         physicalType    patch;
-        nFaces          28;
-        startFace       182;
+        nFaces          640;
+        startFace       102080;
     }
 )
 

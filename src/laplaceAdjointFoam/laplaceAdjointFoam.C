@@ -48,12 +48,15 @@ int main(int argc, char *argv[])
     scalar J = 0;
     scalar Jold = 0;
     scalar Jk = 0;
+    scalar error = 0;
 
 // Compute cost function value
 #include "costFunctionValue.H"
 
-    std::ofstream file("results.csv");
+    std::ofstream file("cost.csv");
     file << 0 << "," << J << "," << 0 << nl;
+
+    std::ofstream errorFile("error.csv");
 
     while (runTime.loop() && fabs(J - Jold) > tol)
     {
@@ -77,12 +80,13 @@ int main(int argc, char *argv[])
         // calculate derivative^2 integrate((lambda*u + beta*p)^2 dv). Why??
         scalar phip0 = gSum(volField * Foam::pow(lambda * uk.internalField() + beta * p.internalField(), 2));
 
-        while (!alphaFound)
+        while ((!alphaFound) && (alpha > tol))
         {
             u = uk - alpha * (lambda * uk + beta * p);
 
             // truncate u for constrained control set
-            forAll(u,i){
+            forAll(u, i)
+            {
                 u[i] = min(u[i], uMax[i]);
                 u[i] = max(u[i], uMin[i]);
             }
@@ -113,22 +117,40 @@ int main(int argc, char *argv[])
              << " - "
              << "Cost variation" << fabs(J - Jold) << endl;
 
+        file.open("cost.csv",std::ios::app);
         file << runTime.value() << "," << J << nl;
+        file.close();
 
-        uc = -(beta/lambda)*p;
-        udiff = u - uc;
+        // calculate the L2 norm of the error in control variables
+        error = Foam::sqrt(gSum(volField * (Foam::pow(u.internalField() - ud.internalField(), 2))));
+        
+        errorFile.open("error.csv",std::ios::app);
+        errorFile << runTime.value() << "," << error << nl;
+        errorFile.close();
+
+        Info << "Iteration no. " << runTime.timeName() << " - " << "error " << error << endl;
+
+
+        uDiff = u - ud;
+        forAll(uDiff,i)
+        {
+            uDiff[i] = fabs(u[i] - ud[i]);
+        }
 
         runTime.write();
     }
 
     file.close();
+    errorFile.close();
 
     runTime++;
     y.write();
     p.write();
     u.write();
-    uc.write();
-    udiff.write();
+    uDiff.write();
+    ud.write();
+    //    uc.write();
+    //    udiff.write();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
